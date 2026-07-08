@@ -8,11 +8,26 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // CORS setup
-const allowedOrigin = process.env.FRONTEND_URL || 'http://localhost:5173';
+// const allowedOrigin = process.env.FRONTEND_URL || 'http://localhost:5173';
+// app.use(cors({
+//   origin: allowedOrigin,
+//   methods: ['GET', 'POST'],
+//   credentials: true
+// }));
+const allowedOrigins = process.env.FRONTEND_URL
+  ? process.env.FRONTEND_URL.split(',')
+  : ['http://localhost:5173'];
+
 app.use(cors({
-  origin: allowedOrigin,
-  methods: ['GET', 'POST'],
-  credentials: true
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  credentials: true,
 }));
 
 app.use(express.json());

@@ -19,11 +19,11 @@ const allowedOrigins = process.env.FRONTEND_URL
   : ['http://localhost:5173'];
 
 app.use(cors({
-  origin: (origin, callback) => {
+  origin(origin, callback) {
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
-      callback(new Error('Not allowed by CORS'));
+      callback(new Error(`Origin ${origin} not allowed by CORS`));
     }
   },
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
@@ -52,12 +52,25 @@ app.use((err, req, res, next) => {
 const server = http.createServer(app);
 
 // Socket.IO setup
+// const io = new Server(server, {
+//   cors: {
+//     origin: process.env.SOCKET_CORS_ORIGIN || allowedOrigin,
+//     methods: ['GET', 'POST'],
+//     credentials: true
+//   }
+// });
 const io = new Server(server, {
   cors: {
-    origin: process.env.SOCKET_CORS_ORIGIN || allowedOrigin,
+    origin(origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error(`Origin ${origin} not allowed by CORS`));
+      }
+    },
     methods: ['GET', 'POST'],
-    credentials: true
-  }
+    credentials: true,
+  },
 });
 
 // Socket.IO Handlers
@@ -68,7 +81,8 @@ server.listen(PORT, () => {
   console.log(`=========================================`);
   console.log(`YouTube Watch Party Backend is running!`);
   console.log(`Server Port: ${PORT}`);
-  console.log(`Allowed Origin: ${allowedOrigin}`);
+  // console.log(`Allowed Origin: ${allowedOrigin}`);
+  console.log("Allowed Origins:", allowedOrigins);
   console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
   console.log(`=========================================`);
 });

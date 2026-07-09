@@ -33,9 +33,33 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+
+// Home Route
+app.get('/', (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: "🚀 YouTube Watch Party Backend is Running!",
+    status: "Online",
+    version: "1.0.0",
+    endpoints: {
+      health: "/health",
+      api: "/api"
+    }
+  });
+});
+
+
 // Health Check Route
+// app.get('/health', (req, res) => {
+//   res.status(200).json({ status: 'OK', uptime: process.uptime() });
+// });
 app.get('/health', (req, res) => {
-  res.status(200).json({ status: 'OK', uptime: process.uptime() });
+  res.status(200).json({
+    status: "OK",
+    uptime: process.uptime(),
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV || "development"
+  });
 });
 
 // REST Routes
